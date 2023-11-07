@@ -1,0 +1,39 @@
+    #打开缺件执行
+    page.locator(".div_input").first.click()
+    page.locator("i").first.dblclick()
+    page.get_by_role("menuitem", name="物流配送 ").locator("div").nth(4).click()
+    page.get_by_title("仓储配送计划缺件执行").click()
+
+    #点击下箭头
+    page.get_by_label("chevrondown").click()
+
+    #输入起始日期
+    page.locator(".dx-texteditor-input").first.click()
+    page.locator(".dx-texteditor-input").first.fill("2023-10-30")
+    page.locator(".dx-texteditor-input").first.press("Enter")
+
+    #输入结束日期
+    page.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").click()
+    page.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill("2023-11-09")
+    page.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
+
+    #选择生产线
+    page.locator(".dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-buttons-container > .dx-widget").first.click()
+    page.get_by_text("总装一线").click()
+
+    #输入物料编码（批量）
+    page.locator(".search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container").click()
+    page.locator(".search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill("15351 215351 51351")
+    page.locator(".search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
+
+    #点击搜索
+    page.get_by_label("find").click()
+
+    #下载表格
+    page.get_by_label("导出").click()
+    with page.expect_download() as download_info:  
+        page.get_by_text("导出所有数据").click()
+    download = download_info.value
+    download.save_as(".\download\仓储配送计划缺件执行.xlsx")
+    #点击全选
+    page.get_by_role("columnheader", name="全选").click()
