@@ -104,6 +104,7 @@ def DeleteNoStockRow(diffTable:pandas.DataFrame,stockTable:pandas.DataFrame):
     diffTable.drop(diffTable[matchFlags].index,inplace = True)
 
 def Process(diffTablePath,stockTablePath,downloadStockTableCallBack):
+    UpdateInfo()
     diffTable = pandas.read_excel(diffTablePath,sheet_name='exportFile',index_col='序号',converters={'供应商编码':str})
     DeleteNonOutbondSupplyerRow(diffTable)
     DeleteProductionCompletedDateRow(diffTable)
