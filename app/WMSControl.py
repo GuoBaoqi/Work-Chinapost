@@ -1,12 +1,10 @@
 from playwright.sync_api import sync_playwright, Playwright
 import pandas
 
-import app.GenInStockDiffTable as GenDiffInStockTable
-
 context = None
 dateConfig = pandas.read_excel(r".\data\Config.xlsx",sheet_name = "日期配置")
 
-def init(playwright: Playwright):
+def InitBrowser(playwright: Playwright):
 
     global context
     context = playwright.chromium.launch_persistent_context(user_data_dir="C:\\Users\\Administrator\\AppData\\Local\\Google\\Chrome\\User Data\\Default",headless=False)
@@ -65,8 +63,7 @@ def DownLoadDiffTable():
     page.close()
     return
 
-
-def DownLoadStockTable(diffTable:pandas.DataFrame):
+def DownLoadDiffInStockTable(diffTable:pandas.DataFrame):
 
     diffItem = " ".join(diffTable["物料编码"])
 
@@ -113,27 +110,6 @@ def DownLoadStockTable(diffTable:pandas.DataFrame):
     download = download_info.value
     download.save_as(r".\download\差异物料库存查询.xlsx")
     page.close()
-
-def PreprocessData():
-    diffTable = pandas.read_excel(r".\target\在库差异表.xlsx")
-
-    diffStockItems = pandas.DataFrame()
-    indexCount = 0
-    for date in diffTable['生产日期'].drop_duplicates():
-        itemCodes = " ".join(diffTable[(diffTable['生产日期'] == date) & (diffTable['生产线'] == "L1")]["物料编码"].to_list())
-        if itemCodes:
-            tempDf = pandas.DataFrame({'生产日期':date,"生产线":"L1","物料编码":itemCodes},index=[indexCount])
-            diffStockItems = pandas.concat([diffStockItems, tempDf])
-            indexCount += 1
-
-        itemCodes = " ".join(diffTable[(diffTable['生产日期'] == date) & (diffTable['生产线'] == "L2")]["物料编码"].to_list())
-        if itemCodes:
-            tempDf = pandas.DataFrame({'生产日期':date,"生产线":"L2","物料编码":itemCodes},index=[indexCount])
-            diffStockItems = pandas.concat([diffStockItems, tempDf])
-            indexCount += 1
-
-    diffStockItems.to_excel(r".\target\diffStockItems.xlsx")
-    return diffStockItems
 
 def OutboundDiffItem(diffStockItems:pandas.DataFrame):
     page = context.new_page()
@@ -184,23 +160,35 @@ def OutboundDiffItem(diffStockItems:pandas.DataFrame):
         except:
             pass
         #点击确定
-        try:
-            page.get_by_role("button", name="确 定").click()
-        except:
-            pass
-
-
+        page.get_by_role("button", name="确 定").click()
     page.close()
 
-if __name__ == "__main__":
-    with sync_playwright() as playwright:
-        init(playwright)
-        while 1:
-            try:
-                DownLoadDiffTable()
-                GenDiffInStockTable.Process(r".\download\仓储配送计划缺件执行.xlsx",r".\download\差异物料库存查询.xlsx",DownLoadStockTable)
-                diffStockItems = PreprocessData()
-                OutboundDiffItem(diffStockItems)
-                print("已完成。开始新一轮:")
-            except:
-                print("出差异失败自动重试中。。。")
+def DownLoadUnshelvedStockTable():
+    page = context.new_page()
+    page.goto("http://wms.sinotruk.com/") 
+    
+    #打开库存查询
+    page.get_by_role("menuitem", name="报表管理 ").hover()
+    page.wait_for_timeout(200)
+    page.get_by_title("库存查询", exact=True).hover()
+    page.wait_for_timeout(200)
+    page.get_by_title("物料库存查询").click()
+    page.wait_for_timeout(1000)
+    #点击下箭头
+    page.get_by_label("chevrondown").click()
+    #输入库区编码
+    page.locator("#kuQuId > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").click()
+    page.locator("#kuQuId > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill("S")
+    page.locator("#kuQuId > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
+    #点击上箭头
+    page.get_by_label("chevronup").click()
+    #点击搜索
+    page.get_by_label("find").click()
+    page.wait_for_timeout(1000)
+    #下载表格
+    page.get_by_label("导出").click()
+    with page.expect_download() as download_info:  
+        page.get_by_text("导出所有数据").click()
+    download = download_info.value
+    download.save_as(".\download\S库物料库存查询.xlsx")
+    page.close()
