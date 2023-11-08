@@ -97,7 +97,7 @@ def DeleteNonOutbondStock(stockTable:pandas.DataFrame):
 
     #删除临时不出库条目
     matchFlags = stockTable.apply(lambda row :not 临时不出库物料表[临时不出库物料表['物料编码'] == row['物料编码']].empty,axis='columns')
-    dropTable = stockTable[matchFlags].copy()
+    stockTable.drop(stockTable[matchFlags].index,inplace = True)
 
 def DeleteNoStockRow(diffTable:pandas.DataFrame,stockTable:pandas.DataFrame):
     matchFlags = diffTable.apply(lambda row : stockTable[stockTable['物料编码'] == row['物料编码']].empty,axis='columns')
