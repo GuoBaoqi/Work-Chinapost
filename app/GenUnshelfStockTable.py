@@ -45,12 +45,12 @@ def PartsSubCodeToStockCode(row):
     if 库位表[库位表['物料子图号'] == row['物料子图号']]['库位编码'].empty:
         if 料名班组表[料名班组表['物料名称'] == row['物料名称']]['班组名称'].empty:
             print('有未知物料！\n物料编码：'+row['物料编码']+'\n物料名称：'+row['物料名称'])
-            teamName = input('请输入班组：')
-            if teamName != '':
-                tempdf=pandas.DataFrame({'物料名称':[row['物料名称']],'班组名称':[teamName]})
-                料名班组表 = pandas.concat([料名班组表, tempdf])
-                WriteToData(料名班组表,'料名班组表')
-                return teamName
+#            teamName = input('请输入班组：')
+#            if teamName != '':
+#                tempdf=pandas.DataFrame({'物料名称':[row['物料名称']],'班组名称':[teamName]})
+#                料名班组表 = pandas.concat([料名班组表, tempdf])
+#                WriteToData(料名班组表,'料名班组表')
+#                return teamName
             return None
         else:
             return 料名班组表[料名班组表['物料名称'] == row['物料名称']]['班组名称'].iloc[0]
