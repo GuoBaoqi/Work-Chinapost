@@ -123,6 +123,6 @@ def Process(diffTablePath,stockTablePath):
 if __name__ == '__main__':
     while True:
         input('请更新缺件表，而后回车开始执行')
-        diffTablePath='tmp\\仓储配送计划缺件执行.xlsx'
-        stockTablePath = 'tmp\\物料库存查询.xlsx'
+        diffTablePath='download\\仓储配送计划缺件执行.xlsx'
+        stockTablePath = 'download\\差异物料库存查询.xlsx'
         Process(diffTablePath,stockTablePath)
