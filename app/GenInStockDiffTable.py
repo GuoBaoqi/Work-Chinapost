@@ -46,7 +46,12 @@ def DeleteProductionCompletedDateRow(diffTable:pandas.DataFrame):
     diffTable.drop(diffTable[matchFlags].index,inplace = True)
 
 def DeleteNonOutbondRow(diffTable:pandas.DataFrame):
+    #删除不出库条目
     matchFlags=diffTable.apply(lambda row : False if 缺件不出库表[(缺件不出库表['生产日期']==row['生产日期']) & (缺件不出库表['生产线'] == row['生产线']) & (缺件不出库表['物料编码'] == row['物料编码'])].empty else True,axis='columns')
+    diffTable.drop(diffTable[matchFlags].index,inplace = True)
+
+    #删除临时不出库条目
+    matchFlags = diffTable.apply(lambda row :not 临时不出库物料表[临时不出库物料表['物料编码'] == row['物料编码']].empty,axis='columns')
     diffTable.drop(diffTable[matchFlags].index,inplace = True)
 
 def CheckRevoke(diffTable:pandas.DataFrame):
@@ -94,10 +99,6 @@ def DeleteNonOutbondStock(stockTable:pandas.DataFrame):
 
     #删除未锁帐为0条目
     stockTable.drop(stockTable[stockTable['未锁账数量'] == 0].index,inplace = True)
-
-    #删除临时不出库条目
-    matchFlags = stockTable.apply(lambda row :not 临时不出库物料表[临时不出库物料表['物料编码'] == row['物料编码']].empty,axis='columns')
-    stockTable.drop(stockTable[matchFlags].index,inplace = True)
 
 def DeleteNoStockRow(diffTable:pandas.DataFrame,stockTable:pandas.DataFrame):
     matchFlags = diffTable.apply(lambda row : stockTable[stockTable['物料编码'] == row['物料编码']].empty,axis='columns')
