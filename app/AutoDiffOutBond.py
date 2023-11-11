@@ -3,6 +3,7 @@ import pandas
 
 import app.GenInStockDiffTable as GenDiffInStockTable
 import app.WMSControl as WMSControl
+import app.Base as Base
 
 def PreprocessData():
     diffTable = pandas.read_excel(r".\target\在库差异表.xlsx")
@@ -36,8 +37,8 @@ def Process():
             WMSControl.OutboundDiffItem(diffStockItems)
             break
         except:
-            print("出差异失败自动重试中。。。")
-    print("出差异成功。")
+            Base.Print("出差异失败自动重试中。。。")
+    Base.Print("出差异成功。")
 
 if __name__ == "__main__":
     with sync_playwright() as playwright:

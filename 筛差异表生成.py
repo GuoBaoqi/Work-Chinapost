@@ -1,6 +1,8 @@
 import pandas
 import re
 
+import app.Base as Base
+
 不出库供应商表 = pandas.read_excel('data\\Config.xlsx',sheet_name='不出库供应商表',converters={'供应商编码':str})
 不出库库区表 = pandas.read_excel('data\\Config.xlsx',sheet_name='不出库库区表')
 临时不出库物料表 = pandas.read_excel('data\\Config.xlsx',sheet_name='临时不出库物料表')
@@ -61,7 +63,7 @@ def CheckRevoke(diffTable:pandas.DataFrame):
         return
     dropIndexs = list()
     for index,row in NewRevokeTable.iterrows():
-        print('有新增撤单需求请处理：\n'+'生产日期：'+row['生产日期']+'\n生产线：'+row['生产线']+'\n物料编码：'+row['物料编码']+'\n物料名称：'+row['物料名称']+'\n缺件原因：'+row['缺件原因'])
+        Base.Print('有新增撤单需求请处理：\n'+'生产日期：'+row['生产日期']+'\n生产线：'+row['生产线']+'\n物料编码：'+row['物料编码']+'\n物料名称：'+row['物料名称']+'\n缺件原因：'+row['缺件原因'])
         while 1:
             isOutStock = input('是否出库？（y/tn/n）')
             if isOutStock == 'y':

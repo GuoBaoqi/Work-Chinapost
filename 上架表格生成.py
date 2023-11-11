@@ -1,4 +1,5 @@
 import pandas
+import app.Base as Base
 
 库区表 = pandas.read_excel('data\\Config.xlsx',sheet_name='库区表')
 库位表 = pandas.read_excel('data\\库位表.xlsx',sheet_name='库位表')
@@ -44,7 +45,7 @@ def PartsSubCodeToStockCode(row):
     global 料名班组表
     if 库位表[库位表['物料子图号'] == row['物料子图号']]['库位编码'].empty:
         if 料名班组表[料名班组表['物料名称'] == row['物料名称']]['班组名称'].empty:
-            print('有未知物料！\n物料编码：'+row['物料编码']+'\n物料名称：'+row['物料名称'])
+            Base.Print('有未知物料！\n物料编码：'+row['物料编码']+'\n物料名称：'+row['物料名称'])
             teamName = input('请输入班组：')
             if teamName != '':
                 tempdf=pandas.DataFrame({'物料名称':[row['物料名称']],'班组名称':[teamName]})
@@ -80,7 +81,8 @@ def Process(stockTablePath, diffTablePath):
 
 if __name__ == '__main__':
     while True:
-        input('请更新S库与缺件表，而后回车开始执行')
+        Base.Print('请更新S库与缺件表，而后回车开始执行')
+        input()
         stockTablePath='download\\S库物料库存查询.xlsx'
         diffTablePath='download\\仓储配送计划缺件执行.xlsx'
         Process(stockTablePath, diffTablePath)
