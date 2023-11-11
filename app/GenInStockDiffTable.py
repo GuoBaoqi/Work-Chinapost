@@ -89,12 +89,12 @@ def CheckRevoke(diffTable:pandas.DataFrame):
 
 def DeleteNonOutbondStock(stockTable:pandas.DataFrame):
     #找出不出库库区库存条目
-    matchFlags = stockTable.apply(lambda row :not 不出库库区表[不出库库区表['库区编码'] == row['库区编码']].empty,axis='columns')
+    matchFlags = stockTable.apply(lambda row :not 不出库库区表[不出库库区表['库位编码'].str.startswith(row['库区编码'])].empty,axis='columns')
     dropTable = stockTable[matchFlags].copy()
 
     #处理C15库区特殊库存
     searchStrBool=lambda pattern,string:not (re.search(pattern,string) is None)
-    matchFlags = dropTable.apply(lambda row :(row['库区编码'] == '312302.C15') & ( searchStrBool('艾里逊',row['供应商名称']) | searchStrBool('取力器',row['物料名称'])),axis='columns')
+    matchFlags = dropTable.apply(lambda row :(不出库库区表['库位编码'].str.startswith(row['312302.C15'])) & ( searchStrBool('艾里逊',row['供应商名称']) | searchStrBool('取力器',row['物料名称'])),axis='columns')
     dropTable.drop(dropTable[matchFlags].index,inplace = True)
 
     stockTable.drop(dropTable.index,inplace = True)
