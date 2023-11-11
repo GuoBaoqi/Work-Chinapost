@@ -7,6 +7,7 @@ import app.GenUnshelfStockTable as GenUnshelfStockTable
 def Process():
     while 1:
         try:
+            WMSControl.DownLoadDiffTable()
             WMSControl.DownLoadUnshelvedStockTable()
             GenUnshelfStockTable.Process(r".\download\S库物料库存查询.xlsx",r".\download\仓储配送计划缺件执行.xlsx")
             break
