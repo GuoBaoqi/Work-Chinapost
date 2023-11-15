@@ -22,6 +22,8 @@ def FormatStockTable(stockTable:pandas.DataFrame):
     #移动列
     tmp = stockTable.pop('库位调整时间')
     stockTable.insert(stockTable.columns.get_loc('物料子图号'),'库位调整时间',tmp)
+    tmp = stockTable.pop('供应商名称')
+    stockTable.insert(stockTable.columns.get_loc('供应商编码'),'供应商名称',tmp)
     tmp = stockTable.pop('库位编码')
     stockTable.insert(stockTable.columns.get_loc('供应商编码'),'库位编码',tmp)
     tmp = stockTable.pop('未锁账数量')
@@ -46,12 +48,12 @@ def PartsSubCodeToStockCode(row):
     if 库位表[库位表['物料子图号'] == row['物料子图号']]['库位编码'].empty:
         if 料名班组表[料名班组表['物料名称'] == row['物料名称']]['班组名称'].empty:
             Base.Print('有未知物料！\n物料编码：'+row['物料编码']+'\n物料名称：'+row['物料名称'])
-#            teamName = input('请输入班组：')
-#            if teamName != '':
-#                tempdf=pandas.DataFrame({'物料名称':[row['物料名称']],'班组名称':[teamName]})
-#                料名班组表 = pandas.concat([料名班组表, tempdf])
-#                WriteToData(料名班组表,'料名班组表')
-#                return teamName
+            teamName = input('请输入班组：')
+            if teamName != '':
+                tempdf=pandas.DataFrame({'物料名称':[row['物料名称']],'班组名称':[teamName]})
+                料名班组表 = pandas.concat([料名班组表, tempdf])
+                WriteToData(料名班组表,'料名班组表')
+                return teamName
             return None
         else:
             return 料名班组表[料名班组表['物料名称'] == row['物料名称']]['班组名称'].iloc[0]
