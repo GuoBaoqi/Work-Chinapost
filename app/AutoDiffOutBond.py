@@ -38,7 +38,10 @@ def Process():
             WMSControl.OutboundDiffItem(diffStockItems)
             break
         except:
-            Base.Print("出差异失败自动重试中。。。")
+            chose = input("出差异失败，输入y重试：")
+            if chose != "y":
+                break
+            Base.Print("出差异失败重试中。。。")
     Base.Print("出差异成功。")
 
 if __name__ == "__main__":
