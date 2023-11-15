@@ -31,6 +31,7 @@ def PreprocessData():
 def Process():
     while 1:
         try:
+            WMSControl.UpdateInfo()
             WMSControl.DownLoadDiffTable()
             GenDiffInStockTable.Process(r".\download\仓储配送计划缺件执行.xlsx",r".\download\差异物料库存查询.xlsx",WMSControl.DownLoadDiffInStockTable)
             diffStockItems = PreprocessData()

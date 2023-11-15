@@ -4,6 +4,10 @@ import pandas
 context = None
 dateConfig = pandas.read_excel(r".\data\Config.xlsx",sheet_name = "日期配置")
 
+def UpdateInfo():
+    global dateConfig
+    dateConfig = pandas.read_excel(r".\data\Config.xlsx",sheet_name = "日期配置")
+
 def InitBrowser(playwright: Playwright):
 
     global context
