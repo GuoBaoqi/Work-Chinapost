@@ -1,4 +1,4 @@
-/target/*
-/tmp
+\target\*
+\download\*
 __pycache__
 *.pyc
