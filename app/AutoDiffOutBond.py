@@ -11,7 +11,7 @@ def PreprocessData():
     diffStockItems = pandas.DataFrame()
     indexCount = 0
     for date in diffTable['生产日期'].drop_duplicates():
-        itemCodes = " ".join(diffTable[(diffTable['生产日期'] == date) & (diffTable['生产线'] == "L1")]["物料编码"].to_list())
+        itemCodes = " ".join(diffTable[(diffTable['生产日期'] == date) & (diffTable['生产线'] == "L1")]["物料编码"].drop_duplicates().to_list())
         if itemCodes:
             tempDf = pandas.DataFrame({'生产日期':date,"生产线":"L1","物料编码":itemCodes},index=[indexCount])
             diffStockItems = pandas.concat([diffStockItems, tempDf])
