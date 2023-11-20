@@ -67,7 +67,13 @@ def CheckRevoke(diffTable:pandas.DataFrame):
     if NewRevokeTable.empty:
         return
     dropIndexs = list()
+    tempDropCode = list()
     for index,row in NewRevokeTable.iterrows():
+        #若物料编码为本次不出物料则直接加入移除列表
+        if row['物料编码'] in tempDropCode:
+            dropIndexs.append(index)
+            continue
+        #处理新增撤单项
         Base.Print('有新增撤单需求请处理：\n'+'生产日期：'+row['生产日期']+'\n生产线：'+row['生产线']+'\n物料编码：'+row['物料编码']+'\n物料名称：'+row['物料名称']+'\n缺件原因：'+row['缺件原因'])
         while 1:
             isOutStock = input('是否出库？（y/tn/n）')
@@ -83,6 +89,7 @@ def CheckRevoke(diffTable:pandas.DataFrame):
                 dropIndexs.append(index)
                 break
             elif isOutStock == 'tn':
+                tempDropCode.append(row['物料编码'])
                 dropIndexs.append(index)
                 break
     diffTable.drop(dropIndexs,inplace = True)
