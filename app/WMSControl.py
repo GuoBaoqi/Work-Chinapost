@@ -11,7 +11,7 @@ def UpdateInfo():
 def InitBrowser(playwright: Playwright):
 
     global context
-    context = playwright.chromium.launch_persistent_context(channel='msedge',chromium_sandbox = True,user_data_dir="C:\\Users\\Administrator\\AppData\\Local\\Google\\Chrome\\User Data",no_viewport=True,headless=False)
+    context = playwright.chromium.launch_persistent_context(chromium_sandbox = True,user_data_dir="C:\\Users\\Administrator\\AppData\\Local\\Google\\Chrome\\User Data",no_viewport=True,headless=False)
 
 #    browser = playwright.chromium.launch(headless=False)
 #    context = browser.new_context()
