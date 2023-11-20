@@ -69,7 +69,7 @@ def DownLoadDiffTable():
 
 def DownLoadDiffInStockTable(diffTable:pandas.DataFrame):
 
-    diffItem = " ".join(diffTable["物料编码"])
+    diffItem = " ".join(diffTable["物料编码"].drop_duplicates())
 
     page = context.new_page()
     page.goto("http://wms.sinotruk.com/") 
@@ -142,10 +142,10 @@ def OutboundDiffItem(diffStockItems:pandas.DataFrame):
         page.locator(".dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-buttons-container > .dx-widget").first.click()
         page.get_by_text("总装一线" if row["生产线"] == "L1" else "总装二线").click()
         #输入物料编码（批量）
-        page.locator(".search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Backspace")
-        page.locator(".search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container").click()
-        page.locator(".search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill(row["物料编码"])
-        page.locator(".search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
+        page.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container").click()
+        page.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Backspace")
+        page.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill(row["物料编码"])
+        page.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
         #点击搜索
         page.get_by_label("find").click()
         page.wait_for_timeout(1000)
