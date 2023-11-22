@@ -142,13 +142,11 @@ def OutboundDiffItem(diffStockItems:pandas.DataFrame):
         page.locator(".dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-buttons-container > .dx-widget").first.click()
         page.get_by_text("总装一线" if row["生产线"] == "L1" else "总装二线").click()
         #输入物料编码（批量）
-        page.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container").click(click_count=3,delay=100)
+        page.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container").click()
         page.wait_for_timeout(500)
-        try:
-            page.get_by_label("没有要显示的数据").get_by_text("清空").click(timeout=1500)
-        except:
-            pass
-        page.wait_for_timeout(500)
+        page.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill("求求你鑫海智桥! 别再写不稳定的垃圾控件了！")
+        page.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
+        page.get_by_label("没有要显示的数据").get_by_text("清空").click()
         page.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill(row["物料编码"])
         page.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
         #点击搜索
