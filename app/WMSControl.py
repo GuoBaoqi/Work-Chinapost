@@ -158,7 +158,7 @@ def OutboundDiffItem(diffStockItems:pandas.DataFrame):
         page.get_by_role("columnheader", name="全选").click()
         page.wait_for_timeout(1000)
         #出库
-        if pandas.to_datetime(row["生产日期"]) <= dateConfig["跨分拣截止日期"].iloc[0]:
+        if row["跨分拣"] == "是":
             page.get_by_label("跨分拣执行").click()
         else:
             page.get_by_label("执行出库").click()
