@@ -163,7 +163,7 @@ def OutboundDiffItem(diffStockItems:pandas.DataFrame):
 
         #前序继续
         try:
-            page.get_by_role("button", name="继续").click()
+            page.get_by_role("button", name="继续").click(timeout=5000)
         except:
             pass
         #点击确定
