@@ -24,13 +24,15 @@ def FormatStockTable(stockTable:pandas.DataFrame):
     stockTable.insert(stockTable.columns.get_loc('物料子图号'),'库位调整时间',tmp)
     tmp = stockTable.pop('供应商名称')
     stockTable.insert(stockTable.columns.get_loc('供应商编码'),'供应商名称',tmp)
-    tmp = stockTable.pop('库位编码')
-    stockTable.insert(stockTable.columns.get_loc('供应商编码'),'库位编码',tmp)
+    tmp = stockTable.pop('库区编码')
+    stockTable.insert(stockTable.columns.get_loc('供应商编码'),'库区编码',tmp)
     tmp = stockTable.pop('未锁账数量')
     stockTable.insert(stockTable.columns.get_loc('供应商编码'),'未锁账数量',tmp)
     tmp = stockTable.pop('锁帐数量')
     stockTable.insert(stockTable.columns.get_loc('供应商编码'),'锁帐数量',tmp)
     tmp = stockTable.pop('总库存数量')
+    stockTable.insert(stockTable.columns.get_loc('供应商编码'),'总库存数量',tmp)
+    tmp = stockTable.pop('物料编码')
     stockTable.insert(stockTable.columns.get_loc('供应商编码'),'总库存数量',tmp)
 
     #生成列
