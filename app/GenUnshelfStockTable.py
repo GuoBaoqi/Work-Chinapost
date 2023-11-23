@@ -36,8 +36,8 @@ def FormatStockTable(stockTable:pandas.DataFrame):
     stockTable.insert(stockTable.columns.get_loc('供应商编码'),'物料编码',tmp)
 
     #生成列
-    stockTable.insert(stockTable.columns.get_loc('库位编码'),'上架库位',[None] * stockTable.index.size)
-    stockTable.insert(stockTable.columns.get_loc('库位编码'),'差异日期',[None] * stockTable.index.size)
+    stockTable.insert(stockTable.columns.get_loc('库区编码'),'上架库位',[None] * stockTable.index.size)
+    stockTable.insert(stockTable.columns.get_loc('库区编码'),'差异日期',[None] * stockTable.index.size)
     
 def DeleteGarbageRow(stockTable:pandas.DataFrame):
     #删除c01和c02库区以外的行
