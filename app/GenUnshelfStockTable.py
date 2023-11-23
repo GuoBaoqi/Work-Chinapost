@@ -33,7 +33,7 @@ def FormatStockTable(stockTable:pandas.DataFrame):
     tmp = stockTable.pop('总库存数量')
     stockTable.insert(stockTable.columns.get_loc('供应商编码'),'总库存数量',tmp)
     tmp = stockTable.pop('物料编码')
-    stockTable.insert(stockTable.columns.get_loc('供应商编码'),'总库存数量',tmp)
+    stockTable.insert(stockTable.columns.get_loc('供应商编码'),'物料编码',tmp)
 
     #生成列
     stockTable.insert(stockTable.columns.get_loc('库位编码'),'上架库位',[None] * stockTable.index.size)
