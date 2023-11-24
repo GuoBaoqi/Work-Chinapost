@@ -131,6 +131,7 @@ def GenInStockDiffTable(diffTable:pandas.DataFrame,stockTablePath):
     stockTable.to_excel('target\\差异在库库存表.xlsx')
     DeleteNoStockRow(diffTable,stockTable)
     diffTable.to_excel('target\\在库差异表.xlsx')
+    return diffTable
 
 if __name__ == '__main__':
     while True:
