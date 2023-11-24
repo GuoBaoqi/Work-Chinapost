@@ -6,7 +6,7 @@ import app.WMSControl as WMSControl
 import app.Base as Base
 
 def PreprocessData():
-    diffTable = pandas.read_excel(r".\target\可出库差异表.xlsx")
+    diffTable = pandas.read_excel(r".\target\在库差异表.xlsx")
     dateConfig = pandas.read_excel(r".\data\Config.xlsx",sheet_name = "日期配置")
     分装工位表 = pandas.read_excel(r".\data\Config.xlsx",sheet_name = "分装工位表")
 
