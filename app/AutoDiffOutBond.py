@@ -1,7 +1,7 @@
 from playwright.sync_api import sync_playwright, Playwright
 import pandas
 
-import app.GenInStockDiffTable as GenDiffInStockTable
+import app.GenInStockDiffTable as GenInStockDiffTable
 import app.WMSControl as WMSControl
 import app.Base as Base
 
@@ -76,12 +76,14 @@ def PreprocessData():
 def Process():
     while 1:
         try:
-           WMSControl.UpdateInfo()
-           WMSControl.DownLoadDiffTable()
-           GenDiffInStockTable.Process(r".\download\仓储配送计划缺件执行.xlsx",r".\download\差异物料库存查询.xlsx",WMSControl.DownLoadDiffInStockTable)
-           diffStockItems = PreprocessData()
-           WMSControl.OutboundDiffItem(diffStockItems)
-           break
+            WMSControl.UpdateInfo()
+            WMSControl.DownLoadDiffTable()
+            outbondDiffTable = GenInStockDiffTable.GenOutbondDiffTable(r".\download\仓储配送计划缺件执行.xlsx")
+            WMSControl.DownLoadStockTable(r".\download\差异物料库存查询.xlsx",itemCodes = outbondDiffTable["物料编码"],repositories=["制造部平面仓储5库","制造部平面仓储库","制造部智能立体库"],itemStatus = "合格",minimumStock = "1")
+            GenInStockDiffTable.GenInStockDiffTable(outbondDiffTable,r".\download\差异物料库存查询.xlsx")
+            diffStockItems = PreprocessData()
+            WMSControl.OutboundDiffItem(diffStockItems)
+            break
         except:
             chose = input("出差异失败，输入y重试：")
             if chose != "y":
@@ -93,8 +95,11 @@ if __name__ == "__main__":
     with sync_playwright() as playwright:
         WMSControl.InitBrowser(playwright)
         while 1:
+            WMSControl.UpdateInfo()
             WMSControl.DownLoadDiffTable()
-            GenDiffInStockTable.Process(r".\download\仓储配送计划缺件执行.xlsx",r".\download\差异物料库存查询.xlsx",WMSControl.DownLoadDiffInStockTable)
+            outbondDiffTable = GenInStockDiffTable.GenOutbondDiffTable(r".\download\仓储配送计划缺件执行.xlsx")
+            WMSControl.DownLoadStockTable(r".\download\差异物料库存查询.xlsx",itemCodes = outbondDiffTable["物料编码"],repositories=["制造部平面仓储5库","制造部平面仓储库","制造部智能立体库"],itemStatus = "合格",minimumStock = "1")
+            GenInStockDiffTable.GenInStockDiffTable(outbondDiffTable,r".\download\差异物料库存查询.xlsx")
             diffStockItems = PreprocessData()
             WMSControl.OutboundDiffItem(diffStockItems)
             input("已完成请按回车继续")

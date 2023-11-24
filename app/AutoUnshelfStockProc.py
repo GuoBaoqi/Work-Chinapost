@@ -3,23 +3,27 @@ from playwright.sync_api import sync_playwright, Playwright
 
 import app.WMSControl as WMSControl
 import app.GenUnshelfStockTable as GenUnshelfStockTable
+import app.Base as Base
 
 def Process():
     while 1:
         try:
             WMSControl.UpdateInfo()
             WMSControl.DownLoadDiffTable()
-            WMSControl.DownLoadUnshelvedStockTable()
+            WMSControl.DownLoadStockTable(r".\download\S库物料库存查询.xlsx",stockAreaCode="S")
             GenUnshelfStockTable.Process(r".\download\S库物料库存查询.xlsx",r".\download\仓储配送计划缺件执行.xlsx")
             break
         except:
-            print("催上架失败自动重试中。。。")
-    print("催上架成功。")
+            chose = input("催上架失败，输入y重试：")
+            if chose != "y":
+                break
+            Base.Print("催上架失败重试中。。。")
+    Base.Print("催上架成功。")
 
 if __name__ == "__main__":
     with sync_playwright() as playwright:
         WMSControl.InitBrowser(playwright)
         while 1:
-            WMSControl.DownLoadUnshelvedStockTable()
+            WMSControl.DownLoadStockTable(r".\download\S库物料库存查询.xlsx",stockAreaCode="S")
             GenUnshelfStockTable.Process(r".\download\S库物料库存查询.xlsx",r".\download\仓储配送计划缺件执行.xlsx")
             input("已完成请按回车继续")

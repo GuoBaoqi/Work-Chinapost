@@ -115,31 +115,28 @@ def DeleteNoStockRow(diffTable:pandas.DataFrame,stockTable:pandas.DataFrame):
     matchFlags = diffTable.apply(lambda row : stockTable[stockTable['物料编码'] == row['物料编码']].empty,axis='columns')
     diffTable.drop(diffTable[matchFlags].index,inplace = True)
 
-def Process(diffTablePath,stockTablePath,downloadStockTableCallBack):
+def GenOutbondDiffTable(diffTablePath):
     UpdateInfo()
     diffTable = pandas.read_excel(diffTablePath,sheet_name='exportFile',index_col='序号',converters={'供应商编码':str})
     DeleteNonOutbondSupplyerRow(diffTable)
     DeleteProductionCompletedDateRow(diffTable)
     DeleteNonOutbondRow(diffTable)
     CheckRevoke(diffTable)
-    diffTable.to_excel('target\可出库差异表.xlsx')
-    
-    downloadStockTableCallBack(diffTable)
+    diffTable.to_excel('target\\可出库差异表.xlsx')
+    return diffTable
+
+def GenInStockDiffTable(diffTable:pandas.DataFrame,stockTablePath):
     stockTable = pandas.read_excel(stockTablePath,sheet_name='exportFile',index_col='序号')
     DeleteNonOutbondStock(stockTable)
-    stockTable.to_excel('target\差异在库库存表.xlsx')
+    stockTable.to_excel('target\\差异在库库存表.xlsx')
     DeleteNoStockRow(diffTable,stockTable)
-
-    diffTable.to_excel('target\在库差异表.xlsx')
-    return
-
-def downloadStockTableCallBack(diffTable:pandas.DataFrame):
-    diffTable['物料编码'].to_clipboard(sep=' ',index=False, header=None)
-    input('已将差异物料编码复制致剪切板，请更新物料库存查询。按任意键继续')
 
 if __name__ == '__main__':
     while True:
         input('请更新缺件表，而后回车开始执行')
         diffTablePath='tmp\\仓储配送计划缺件执行.xlsx'
         stockTablePath = 'tmp\\物料库存查询.xlsx'
-        Process(diffTablePath,stockTablePath,downloadStockTableCallBack)
+        outbondDiffTable = GenOutbondDiffTable(diffTablePath)
+        outbondDiffTable['物料编码'].to_clipboard(sep=' ',index=False, header=None)
+        input('已将差异物料编码复制致剪切板，请更新物料库存查询。按任意键继续')
+        GenInStockDiffTable(outbondDiffTable,stockTablePath)
