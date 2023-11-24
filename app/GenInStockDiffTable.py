@@ -130,6 +130,7 @@ def GenInStockDiffTable(diffTable:pandas.DataFrame,stockTablePath):
     DeleteNonOutbondStock(stockTable)
     stockTable.to_excel('target\\差异在库库存表.xlsx')
     DeleteNoStockRow(diffTable,stockTable)
+    diffTable.to_excel('target\\在库差异表.xlsx')
 
 if __name__ == '__main__':
     while True:
