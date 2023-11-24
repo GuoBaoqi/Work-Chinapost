@@ -2,6 +2,7 @@ from playwright.sync_api import sync_playwright, Playwright
 
 import app.AutoDiffOutBond as AutoDiffOutBond
 import app.AutoUnshelfStockProc as AutoUnshelfStockProc
+import app.AtuoToBeInspectedStockProc as AtuoToBeInspectedStockProc
 import app.WMSControl as WMSControl
 import app.Base as Base
 
@@ -21,4 +22,5 @@ if __name__ == "__main__":
                 AutoDiffOutBond.Process()
                 Base.Print("出差异结束")
             elif chose == "3":
-                Base.Print("待检差异表生成功能未完成，操作无效。")
+                Base.Print("正在下载待检差异物料，请确认已经执行过差异：")
+                AtuoToBeInspectedStockProc.DownloadToBeInspectedStockTable()

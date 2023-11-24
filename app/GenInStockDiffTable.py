@@ -122,11 +122,12 @@ def Process(diffTablePath,stockTablePath,downloadStockTableCallBack):
     DeleteProductionCompletedDateRow(diffTable)
     DeleteNonOutbondRow(diffTable)
     CheckRevoke(diffTable)
+    diffTable.to_excel('target\可出库差异表.xlsx')
     
     downloadStockTableCallBack(diffTable)
     stockTable = pandas.read_excel(stockTablePath,sheet_name='exportFile',index_col='序号')
     DeleteNonOutbondStock(stockTable)
-    stockTable.to_excel('target\可出库库存表.xlsx')
+    stockTable.to_excel('target\差异在库库存表.xlsx')
     DeleteNoStockRow(diffTable,stockTable)
 
     diffTable.to_excel('target\在库差异表.xlsx')

@@ -199,3 +199,59 @@ def DownLoadUnshelvedStockTable():
     download = download_info.value
     download.save_as(".\download\S库物料库存查询.xlsx")
     page.close()
+
+def DownLoadStockTable(filePath:str,itemCodes:pandas.Series = None,itemStatus:str = None,stockAreaCode:str=None,minimumStock:str=None):
+
+    itemCodes = " ".join(itemCodes.drop_duplicates())
+
+    page = context.new_page()
+    page.goto("http://wms.sinotruk.com/") 
+    
+    #打开库存查询
+    page.get_by_role("menuitem", name="报表管理 ").hover()
+    page.wait_for_timeout(200)
+    page.get_by_title("库存查询", exact=True).hover()
+    page.wait_for_timeout(200)
+    page.get_by_title("物料库存查询").click()
+    page.wait_for_timeout(1000)
+    #点击下箭头
+    page.get_by_label("chevrondown").click()
+    #输入物料编码(批量)
+    if not (itemCodes is None):
+        page.locator(".dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container").first.click()
+        page.locator(".dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").first.fill(itemCodes)
+        page.locator(".dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").first.press("Enter")
+    #选择仓库
+    page.locator("div:nth-child(14) > .search-content > .search-content-textBox > div > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-buttons-container > .dx-widget").click()
+    page.get_by_text("仓库编码（批量）").click()
+    page.get_by_role("row", name="选择行 制造部平面仓储5库").get_by_label("选择行").click()
+    page.get_by_role("row", name="选择行 制造部平面仓储库").get_by_label("选择行").click()
+    page.get_by_role("row", name="选择行 制造部智能立体库").get_by_label("选择行").click()
+    page.locator("div:nth-child(14) > .search-content > .search-content-textBox > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-buttons-container > .dx-widget").click()
+    #选择状态
+    if not (itemStatus is None):
+        page.locator("div:nth-child(19) > .search-content > .search-content-textBox > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-buttons-container > .dx-widget").click()
+        page.get_by_role("option", name="_ " + itemStatus).locator("div").click()
+    #输入库区编码
+    if not (stockAreaCode is None):
+        page.locator("#kuQuId > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").click()
+        page.locator("#kuQuId > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill("S")
+        page.locator("#kuQuId > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
+    #最小库存
+    if not (minimumStock is None):
+        page.locator("div:nth-child(31) > .search-content > .search-content-textBox > #kuCunQty > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").click()
+        page.locator("div:nth-child(31) > .search-content > .search-content-textBox > #kuCunQty > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill(minimumStock)
+        page.locator("div:nth-child(31) > .search-content > .search-content-textBox > #kuCunQty > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
+    #点击上箭头
+    page.get_by_label("chevronup").click()
+    #点击搜索
+    page.get_by_label("find").click()
+    page.wait_for_timeout(1000)
+
+    #下载表格
+    page.get_by_label("导出").click()
+    with page.expect_download() as download_info:  
+        page.get_by_text("导出所有数据").click()
+    download = download_info.value
+    download.save_as(filePath)
+    page.close()
