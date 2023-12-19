@@ -105,9 +105,6 @@ def DeleteNonOutbondStock(stockTable:pandas.DataFrame):
 
     stockTable.drop(dropTable.index,inplace = True)
 
-    #删除立库中转库区条目
-    stockTable.drop(stockTable[stockTable['库位编码'] == '312302.C02.084206'].index,inplace = True)
-
     #删除未锁帐为0条目
     stockTable.drop(stockTable[stockTable['未锁账数量'] == 0].index,inplace = True)
 
