@@ -1,8 +1,8 @@
 from playwright.sync_api import sync_playwright, Playwright
 import pandas
 
-import app.WMSControl as WMSControl
-import app.Base as Base
+import .WMSControl as WMSControl
+import .Base as Base
 
 
 

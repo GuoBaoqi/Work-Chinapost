@@ -1,5 +1,6 @@
 import pandas
-import app.Base as Base
+
+from . import Base
 
 库区表 = pandas.read_excel('data\\Config.xlsx',sheet_name='库区表')
 库位表 = pandas.read_excel('data\\库位表.xlsx',sheet_name='库位表')

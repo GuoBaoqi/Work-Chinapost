@@ -1,9 +1,9 @@
 from playwright.sync_api import sync_playwright, Playwright
 
 
-import app.WMSControl as WMSControl
-import app.GenUnshelfStockTable as GenUnshelfStockTable
-import app.Base as Base
+from . import WMSControl
+from . import GenUnshelfStockTable
+from . import Base
 
 def Process():
     while 1:

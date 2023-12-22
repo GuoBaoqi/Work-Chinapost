@@ -1,9 +1,9 @@
 from playwright.sync_api import sync_playwright, Playwright
 import pandas
 
-import app.GenInStockDiffTable as GenInStockDiffTable
-import app.WMSControl as WMSControl
-import app.Base as Base
+from . import GenInStockDiffTable
+from . import WMSControl
+from . import Base
 
 def PreprocessData():
     diffTable = pandas.read_excel(r".\target\在库差异表.xlsx")

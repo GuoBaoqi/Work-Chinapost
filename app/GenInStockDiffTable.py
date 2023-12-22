@@ -1,7 +1,7 @@
 import pandas
 import re
 
-import app.Base as Base
+from . import Base
 
 不出库供应商表 = pandas.read_excel('data\\Config.xlsx',sheet_name='不出库供应商表',converters={'供应商编码':str})
 不出库库区表 = pandas.read_excel('data\\Config.xlsx',sheet_name='不出库库区表')
