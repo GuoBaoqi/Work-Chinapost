@@ -109,6 +109,9 @@ def DeleteNonOutbondStock(stockTable:pandas.DataFrame):
     stockTable.drop(stockTable[stockTable['未锁账数量'] == 0].index,inplace = True)
 
 def DeleteNoStockRow(diffTable:pandas.DataFrame,stockTable:pandas.DataFrame):
+    #删除15库物料
+    stockTable.drop(stockTable[stockTable['仓库编码'] == '312315'].index,inplace = True)
+
     matchFlags = diffTable.apply(lambda row : stockTable[stockTable['物料编码'] == row['物料编码']].empty,axis='columns')
     diffTable.drop(diffTable[matchFlags].index,inplace = True)
 
