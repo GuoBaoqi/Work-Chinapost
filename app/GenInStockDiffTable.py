@@ -100,7 +100,7 @@ def DeleteNonOutbondStock(stockTable:pandas.DataFrame):
 
     #处理C15库区特殊库存
     searchStrBool=lambda pattern,string:not (re.search(pattern,string) is None)
-    matchFlags = dropTable.apply(lambda row :((row['库位编码'][:10] if type(row['库位编码']) == str else '') == '312302.C15') & ( searchStrBool('艾里逊',row['供应商名称']) | searchStrBool('取力器',row['物料名称'])),axis='columns')
+    matchFlags = dropTable.apply(lambda row :((row['库位编码'] if type(row['库位编码']) == str else '') == '312302.C15.030101') | searchStrBool('取力器',row['物料名称']),axis='columns')
     dropTable.drop(dropTable[matchFlags].index,inplace = True)
 
     stockTable.drop(dropTable.index,inplace = True)
