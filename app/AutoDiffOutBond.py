@@ -82,6 +82,8 @@ def Process():
             WMSControl.DownLoadStockTable(r".\download\差异物料库存查询.xlsx",itemCodes = outbondDiffTable["物料编码"],repositories=["制造部平面仓储5库","制造部平面仓储库","制造部智能立体库"],itemStatus = "合格",minimumStock = "1")
             GenInStockDiffTable.GenInStockDiffTable(outbondDiffTable,r".\download\差异物料库存查询.xlsx")
             diffStockItems = PreprocessData()
+#            input("更改后按回车继续")
+            diffStockItems = pandas.read_excel(r".\target\diffStockItems.xlsx")
             WMSControl.OutboundDiffItem(diffStockItems)
             break
         except:
