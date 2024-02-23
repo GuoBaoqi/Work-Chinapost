@@ -122,7 +122,7 @@ def OutboundDiffItem(diffStockItems:pandas.DataFrame):
         page.get_by_role("button", name="确 定").click()
     page.close()
 
-def DownLoadStockTable(filePath:str,itemCodes:pandas.Series = None,repositories:list[str]=None,itemStatus:str = None,stockAreaCode:str=None,minimumStock:str=None):
+def DownLoadStockTable(filePath:str,itemCodes:pandas.Series = None,repositories:list[str]=None,itemStatus:str = None,stockAreaCode:str=None,minimumStock:str=None,downloadTimeout=30000):
 
     page = context.new_page()
     page.goto("http://wms.sinotruk.com/") 
@@ -156,7 +156,7 @@ def DownLoadStockTable(filePath:str,itemCodes:pandas.Series = None,repositories:
     #输入库区编码
     if not (stockAreaCode is None):
         page.locator("#kuQuId > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").click()
-        page.locator("#kuQuId > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill("S")
+        page.locator("#kuQuId > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill(stockAreaCode)
         page.locator("#kuQuId > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
     #最小库存
     if not (minimumStock is None):
@@ -171,7 +171,7 @@ def DownLoadStockTable(filePath:str,itemCodes:pandas.Series = None,repositories:
 
     #下载表格
     page.get_by_label("导出").click()
-    with page.expect_download() as download_info:  
+    with page.expect_download(timeout=downloadTimeout) as download_info:  
         page.get_by_text("导出所有数据").click()
     download = download_info.value
     download.save_as(filePath)
