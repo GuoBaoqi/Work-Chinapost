@@ -68,59 +68,94 @@ def DownLoadDiffTable():
     return
 
 def OutboundDiffItem(diffStockItems:pandas.DataFrame):
-    page = context.new_page()
-    page.goto("http://wms.sinotruk.com/") 
+    #库存页面
+    pageStock = context.new_page()
+    pageStock.goto("http://wms.sinotruk.com/") 
+    #打开库存查询
+    pageStock.get_by_role("menuitem", name="报表管理 ").hover()
+    pageStock.wait_for_timeout(200)
+    pageStock.get_by_title("库存查询", exact=True).hover()
+    pageStock.wait_for_timeout(200)
+    pageStock.get_by_title("物料库存查询").click()
+    pageStock.wait_for_timeout(1000)
+    pageStock.get_by_label("chevrondown").click()
+    pageStock.locator("div:nth-child(14) > .search-content > .search-content-textBox > div > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-buttons-container > .dx-widget").click()
+    pageStock.get_by_text("仓库编码（批量）").click()
+    for repositorie in ["制造部平面仓储库","制造部智能立体库"]:
+        pageStock.get_by_role("row", name="选择行 " + repositorie).get_by_label("选择行").click()
+    pageStock.locator("div:nth-child(14) > .search-content > .search-content-textBox > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-buttons-container > .dx-widget").click()
+    pageStock.locator("div:nth-child(19) > .search-content > .search-content-textBox > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-buttons-container > .dx-widget").click()
+    pageStock.get_by_role("option", name="_ " + "合格").locator("div").click()
+    pageStock.get_by_label("chevronup").click()
+
+    #缺件页面
+    pageDiff = context.new_page()
+    pageDiff.goto("http://wms.sinotruk.com/") 
     #打开缺件执行
-    page.get_by_role("menuitem", name="物流配送 ").hover()
-    page.get_by_title("下架补货", exact=True).hover()
-    page.get_by_title("仓储配送计划缺件执行").click()
-    page.wait_for_timeout(1000)
+    pageDiff.get_by_role("menuitem", name="物流配送 ").hover()
+    pageDiff.get_by_title("下架补货", exact=True).hover()
+    pageDiff.get_by_title("仓储配送计划缺件执行").click()
+    pageDiff.wait_for_timeout(1000)
     #选择最大5000条
-    page.get_by_label("Display 5000 items on page").click()
+    pageDiff.get_by_label("Display 5000 items on page").click()
 
     for index,row in diffStockItems.iterrows():
         #点击下箭头
-        page.get_by_label("chevrondown").click()
-        page.wait_for_timeout(1000)
+        pageDiff.get_by_label("chevrondown").click()
+        pageDiff.wait_for_timeout(1000)
         #输入起始日期
-        page.locator(".dx-texteditor-input").first.click()
-        page.locator(".dx-texteditor-input").first.fill(row["生产日期"])
-        page.locator(".dx-texteditor-input").first.press("Enter")
+        pageDiff.locator(".dx-texteditor-input").first.click()
+        pageDiff.locator(".dx-texteditor-input").first.fill(row["生产日期"])
+        pageDiff.locator(".dx-texteditor-input").first.press("Enter")
         #输入结束日期
-        page.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").click()
-        page.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill(row["生产日期"])
-        page.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
+        pageDiff.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").click()
+        pageDiff.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill(row["生产日期"])
+        pageDiff.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
         #选择生产线
-        page.locator(".dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-buttons-container > .dx-widget").first.click()
-        page.get_by_text("总装一线" if row["生产线"] == "L1" else "总装二线").click()
+        pageDiff.locator(".dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-buttons-container > .dx-widget").first.click()
+        pageDiff.get_by_text("总装一线" if row["生产线"] == "L1" else "总装二线").click()
         #输入物料编码（批量）
-        page.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container").click(position={"x": 5, "y": 5})
-        page.wait_for_timeout(500)
-        page.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill("未清空!")
-        page.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
-        page.get_by_label("没有要显示的数据").get_by_text("清空",exact=True).click()
-        page.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill(row["物料编码"])
-        page.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
+        pageDiff.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container").click(position={"x": 5, "y": 5})
+        pageDiff.wait_for_timeout(500)
+        pageDiff.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill("未清空!")
+        pageDiff.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
+        pageDiff.get_by_label("没有要显示的数据").get_by_text("清空",exact=True).click()
+        pageDiff.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill(row["物料编码"])
+        pageDiff.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
         #点击搜索
+        pageDiff.get_by_label("find").click()
+        pageDiff.wait_for_timeout(1000)
+        #点击全选
+        pageDiff.get_by_role("columnheader", name="全选").click()
+        pageDiff.wait_for_timeout(1000)
+
+        #查询库存变动
+        """
+        pageStock.locator(".dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container").first.click(position={"x": 5, "y": 5})
+        pageStock.locator(".dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").first.fill("未清空!")
+        pageStock.locator(".dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").first.press("Enter")
+        pageStock.get_by_text("清空",exact=True).click()
+        pageStock.locator(".dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").first.fill(row["物料编码"])
+        pageStock.locator(".dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").first.press("Enter")
         page.get_by_label("find").click()
         page.wait_for_timeout(1000)
-        #点击全选
-        page.get_by_role("columnheader", name="全选").click()
-        page.wait_for_timeout(1000)
+        """
         #出库
         if row["跨分拣"] == "是":
-            page.get_by_label("跨分拣执行").click()
+            pageDiff.get_by_label("跨分拣执行").click()
         else:
-            page.get_by_label("执行出库").click()
+            pageDiff.get_by_label("执行出库").click()
 
         #前序继续
         try:
-            page.get_by_role("button", name="继续").click(timeout=5000)
+            pageDiff.get_by_role("button", name="继续").click(timeout=5000)
         except:
             pass
         #点击确定
-        page.get_by_role("button", name="确 定").click()
-    page.close()
+        pageDiff.get_by_role("button", name="确 定").click(timeout=60000)
+    #收尾
+    pageDiff.close()
+    pageStock.close()
 
 def DownLoadStockTable(filePath:str,itemCodes:pandas.Series = None,repositories:list[str]=None,itemStatus:str = None,stockAreaCode:str=None,minimumStock:str=None,downloadTimeout=30000):
 
