@@ -42,15 +42,15 @@ def UpdateStockLocationTable():
     newStockLocationTable.reset_index(drop=True)
 
     #删除临时库位物料
-    newStockLocationTable.apply(lambda row : row["库位编码"]=="312302.C02.084206",axis='columns')
+    matchFlags = newStockLocationTable.apply(lambda row : row["库位编码"]=="312302.C02.084206",axis='columns')
     newStockLocationTable.drop(newStockLocationTable[matchFlags].index,inplace = True)
 
-    newStockLocationTable.apply(lambda row : row["库位编码"][:10]=="312302.C13.88",axis='columns')
+    matchFlags = newStockLocationTable.apply(lambda row : row["库位编码"][:13]=="312302.C13.88",axis='columns')
     newStockLocationTable.drop(newStockLocationTable[matchFlags].index,inplace = True)
 
     #删除旧库位表中新库位表有数据的物料
     
-    matchFlags=oldStockLocationTable.apply(lambda row : False if newStockLocationTable[(newStockLocationTable["物料子图号"]==row["物料子图号"])].empty else True,axis='columns')
+    matchFlags = oldStockLocationTable.apply(lambda row : False if newStockLocationTable[(newStockLocationTable["物料子图号"]==row["物料子图号"])].empty else True,axis='columns')
     oldStockLocationTable.drop(oldStockLocationTable[matchFlags].index,inplace = True)
     oldStockLocationTable.reset_index(drop=True)
 
