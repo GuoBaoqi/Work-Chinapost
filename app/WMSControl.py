@@ -67,7 +67,7 @@ def DownLoadDiffTable():
     page.close()
     return
 
-def OutboundDiffItem(diffStockItems:pandas.DataFrame):
+def OutboundDiffItem(diffTable:pandas.DataFrame):
     #缺件页面
     pageDiff = context.new_page()
     pageDiff.goto("http://wms.sinotruk.com/") 
@@ -80,6 +80,9 @@ def OutboundDiffItem(diffStockItems:pandas.DataFrame):
     pageDiff.get_by_label("Display 5000 items on page").click()
 
     for index,row in diffStockItems.iterrows():
+
+        itemCodes = diffTable[(diffTable['生产日期'] == date) & (diffTable['生产线'] == "L1")]["物料编码"].drop_duplicates()
+
         #点击下箭头
         pageDiff.get_by_label("chevrondown").click()
         pageDiff.wait_for_timeout(1000)
@@ -110,6 +113,7 @@ def OutboundDiffItem(diffStockItems:pandas.DataFrame):
         pageDiff.wait_for_timeout(1000)
 
         #查询库存变动
+        DownLoadStockTable("download\\差异物料库存查询.xlsx",itemCodes=itemCodes,repositories=["制造部平面仓储库","制造部智能立体库"],itemStatus="合格")
 
         #出库
         if row["跨分拣"] == "是":
@@ -126,7 +130,6 @@ def OutboundDiffItem(diffStockItems:pandas.DataFrame):
         pageDiff.get_by_role("button", name="确 定").click(timeout=60000)
     #收尾
     pageDiff.close()
-    pageStock.close()
 
 def DownLoadStockTable(filePath:str,itemCodes:pandas.Series = None,repositories:list[str]=None,itemStatus:str = None,stockAreaCode:str=None,minimumStock:str=None,downloadTimeout=30000):
 
