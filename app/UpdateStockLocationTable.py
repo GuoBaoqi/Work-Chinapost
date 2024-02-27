@@ -45,7 +45,7 @@ def UpdateStockLocationTable():
     matchFlags = newStockLocationTable.apply(lambda row : row["库位编码"] == "312302.C02.084206",axis='columns')
     newStockLocationTable.drop(newStockLocationTable[matchFlags].index,inplace = True)
 
-    matchFlags = newStockLocationTable.apply(lambda row : (row["库位编码"][:13] if type(row["库位编码'"]) == str else '') == "312302.C13.88",axis='columns')
+    matchFlags = newStockLocationTable.apply(lambda row : (row["库位编码"][:13] if type(row["库位编码"]) == str else "") == "312302.C13.88",axis='columns')
     newStockLocationTable.drop(newStockLocationTable[matchFlags].index,inplace = True)
 
     #删除旧库位表中新库位表有数据的物料
