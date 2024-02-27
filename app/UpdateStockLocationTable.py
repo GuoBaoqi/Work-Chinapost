@@ -24,12 +24,11 @@ def UpdateStockLocationTable():
     stockTable = pandas.concat([stockTable, pandas.read_excel("download\\库存表.xlsx")])
     WMSControl.DownLoadStockTable("download\\库存表.xlsx",repositories=["制造部平面仓储库"],stockAreaCode="C5",downloadTimeout=0)
     stockTable = pandas.concat([stockTable, pandas.read_excel("download\\库存表.xlsx")])
-    stockTable.reset_index(drop=True)
+    stockTable.reset_index(drop=True,inplace=True)
     stockTable.to_excel("target\\库存表.xlsx")
 
     #生成新库位表
     newStockLocationTable = pandas.DataFrame()
-    newStockLocationTable.index.name = "序号"
     tmp = stockTable.pop("库位编码")
     newStockLocationTable.insert(0,"库位编码",tmp)
     tmp = stockTable.pop("物料名称")
@@ -39,7 +38,7 @@ def UpdateStockLocationTable():
 
     #新库位表去重
     newStockLocationTable.drop_duplicates(subset=["物料子图号","库位编码"],inplace=True)
-    newStockLocationTable.reset_index(drop=True)
+    newStockLocationTable.reset_index(drop=True,inplace=True)
 
     #删除临时库位物料
     matchFlags = newStockLocationTable.apply(lambda row : row["库位编码"] == "312302.C02.084206",axis='columns')
@@ -52,13 +51,13 @@ def UpdateStockLocationTable():
     
     matchFlags = oldStockLocationTable.apply(lambda row : False if newStockLocationTable[(newStockLocationTable["物料子图号"]==row["物料子图号"])].empty else True,axis='columns')
     oldStockLocationTable.drop(oldStockLocationTable[matchFlags].index,inplace = True)
-    oldStockLocationTable.reset_index(drop=True)
 
     #将新库位表中没有的历史库位加入库位表
     newStockLocationTable = pandas.concat([newStockLocationTable, oldStockLocationTable])
-    newStockLocationTable.reset_index(drop=True)
+    newStockLocationTable.reset_index(drop=True,inplace=True)
 
     #保存新库位表
+    newStockLocationTable.index.name = "序号"
     newStockLocationTable.to_excel("data\\库位表.xlsx",sheet_name='库位表')
 
 def Process():
