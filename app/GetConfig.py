@@ -56,4 +56,5 @@ def GetDiffOutboundDateTable():
                 tempDf = pandas.DataFrame({"生产日期":row["生产日期"],"生产线":"L2","跨分拣":"否" },index=[indexCount])
                 DiffOutboundDateTable = pandas.concat([DiffOutboundDateTable, tempDf])
                 indexCount += 1
+    DiffOutboundDateTable.to_excel(".\\targe\\DiffOutboundDateTable.xlsx")
     return DiffOutboundDateTable
