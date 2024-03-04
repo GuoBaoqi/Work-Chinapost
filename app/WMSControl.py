@@ -1,12 +1,10 @@
 from playwright.sync_api import sync_playwright, Playwright
 import pandas
+import time
+
+from . import GetConfig
 
 context = None
-dateConfig = pandas.read_excel(r".\data\Config.xlsx",sheet_name = "日期配置")
-
-def UpdateInfo():
-    global dateConfig
-    dateConfig = pandas.read_excel(r".\data\Config.xlsx",sheet_name = "日期配置")
 
 def InitBrowser(playwright: Playwright):
 
@@ -49,11 +47,11 @@ def DownLoadDiffTable():
     page.get_by_label("chevrondown").click()
     #输入起始日期
     page.locator(".dx-texteditor-input").first.click()
-    page.locator(".dx-texteditor-input").first.fill(dateConfig["起始日期"].iloc[0].strftime('%Y-%m-%d'))
+    page.locator(".dx-texteditor-input").first.fill(GetConfig.GetDiffStartDate().strftime('%Y-%m-%d'))
     page.locator(".dx-texteditor-input").first.press("Enter")
     #输入结束日期
     page.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").click()
-    page.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill(dateConfig["截止日期"].iloc[0].strftime('%Y-%m-%d'))
+    page.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill(GetConfig.GetDiffEndDate().strftime('%Y-%m-%d'))
     page.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
     #点击搜索
     page.get_by_label("find").click()
@@ -68,6 +66,8 @@ def DownLoadDiffTable():
     return
 
 def OutboundDiffItem(diffTable:pandas.DataFrame):
+    subassemblyStationTable = GetConfig.GetSubassemblyStationTable()
+    outboundTime = pandas.Timestamp.now()
     #缺件页面
     pageDiff = context.new_page()
     pageDiff.goto("http://wms.sinotruk.com/") 
@@ -79,59 +79,72 @@ def OutboundDiffItem(diffTable:pandas.DataFrame):
     #选择最大5000条
     pageDiff.get_by_label("Display 5000 items on page").click()
 
-    for index,row in diffStockItems.iterrows():
+    for index,dateTableRow in GetConfig.GetDiffOutboundDateTable().iterrows():
+        while True:
 
-        itemCodes = diffTable[(diffTable['生产日期'] == date) & (diffTable['生产线'] == "L1")]["物料编码"].drop_duplicates()
+            itemCodes = diffTable[diffTable.apply(lambda row : (row["生产日期"] ==dateTableRow["生产日期"]) and (row["生产线"] == dateTableRow["生产线"]) and ((not subassemblyStationTable[subassemblyStationTable["工位"] == row["工位"]].empty) if dateTableRow["跨分拣"]=="分装" else True),axis='columns')]["物料编码"].drop_duplicates()
 
-        #点击下箭头
-        pageDiff.get_by_label("chevrondown").click()
-        pageDiff.wait_for_timeout(1000)
-        #输入起始日期
-        pageDiff.locator(".dx-texteditor-input").first.click()
-        pageDiff.locator(".dx-texteditor-input").first.fill(row["生产日期"])
-        pageDiff.locator(".dx-texteditor-input").first.press("Enter")
-        #输入结束日期
-        pageDiff.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").click()
-        pageDiff.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill(row["生产日期"])
-        pageDiff.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
-        #选择生产线
-        pageDiff.locator(".dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-buttons-container > .dx-widget").first.click()
-        pageDiff.get_by_text("总装一线" if row["生产线"] == "L1" else "总装二线").click()
-        #输入物料编码（批量）
-        pageDiff.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container").click(position={"x": 5, "y": 5})
-        pageDiff.wait_for_timeout(500)
-        pageDiff.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill("未清空!")
-        pageDiff.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
-        pageDiff.get_by_label("没有要显示的数据").get_by_text("清空",exact=True).click()
-        pageDiff.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill(row["物料编码"])
-        pageDiff.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
-        #点击搜索
-        pageDiff.get_by_label("find").click()
-        pageDiff.wait_for_timeout(1000)
-        #点击全选
-        pageDiff.get_by_role("columnheader", name="全选").click()
-        pageDiff.wait_for_timeout(1000)
+            #点击下箭头
+            pageDiff.get_by_label("chevrondown").click()
+            pageDiff.wait_for_timeout(1000)
+            #输入起始日期
+            pageDiff.locator(".dx-texteditor-input").first.click()
+            pageDiff.locator(".dx-texteditor-input").first.fill(dateTableRow["生产日期"])
+            pageDiff.locator(".dx-texteditor-input").first.press("Enter")
+            #输入结束日期
+            pageDiff.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").click()
+            pageDiff.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill(dateTableRow["生产日期"])
+            pageDiff.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
+            #选择生产线
+            pageDiff.locator(".dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-buttons-container > .dx-widget").first.click()
+            pageDiff.get_by_text("总装一线" if dateTableRow["生产线"] == "L1" else "总装二线").click()
+            #输入物料编码（批量）
+            pageDiff.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container").click(position={"x": 5, "y": 5})
+            pageDiff.wait_for_timeout(500)
+            pageDiff.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill("未清空!")
+            pageDiff.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
+            pageDiff.get_by_label("没有要显示的数据").get_by_text("清空",exact=True).click()
+            pageDiff.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill(" ".join(itemCodes.to_list()))
+            pageDiff.locator("div:nth-child(16) > .search-content > .dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
+            #点击搜索
+            pageDiff.get_by_label("find").click()
+            pageDiff.wait_for_timeout(1000)
+            #点击全选
+            pageDiff.get_by_role("columnheader", name="全选").click()
+            pageDiff.wait_for_timeout(1000)
 
-        #查询库存变动
-        DownLoadStockTable("download\\差异物料库存查询.xlsx",itemCodes=itemCodes,repositories=["制造部平面仓储库","制造部智能立体库"],itemStatus="合格")
+            #查询库存变动
+            DownLoadStockTable("download\\差异物料库存查询.xlsx",itemCodes=itemCodes,repositories=["制造部平面仓储库","制造部智能立体库"],itemStatus="合格")
+            diffStockTable = pandas.read_excel("download\\差异物料库存查询.xlsx")
+            #如果库存有所变动
+            changedDiffStockTable = diffStockTable[diffStockTable["库位调整时间"] > outboundTime]
+            if not changedDiffStockTable.empty:
+                matchFlags = diffTable.apply(lambda row :not changedDiffStockTable[changedDiffStockTable['物料编码'] == row['物料编码']].empty,axis='columns')
+                diffTable.drop(diffTable[matchFlags].index,inplace = True)
+                continue
+            break
 
         #出库
-        if row["跨分拣"] == "是":
+        if dateTableRow["跨分拣"] != "否":
             pageDiff.get_by_label("跨分拣执行").click()
         else:
             pageDiff.get_by_label("执行出库").click()
 
         #前序继续
         try:
-            pageDiff.get_by_role("button", name="继续").click(timeout=5000)
+            pageDiff.get_by_role("button", name="继续").click(timeout=2000)
         except:
             pass
+
         #点击确定
         pageDiff.get_by_role("button", name="确 定").click(timeout=60000)
+
+        #记录时间
+        outboundTime = pandas.Timestamp.now()
     #收尾
     pageDiff.close()
 
-def DownLoadStockTable(filePath:str,itemCodes:pandas.Series = None,repositories:list[str]=None,itemStatus:str = None,stockAreaCode:str=None,minimumStock:str=None,downloadTimeout=30000):
+def DownLoadStockTable(filePath:str,itemCodes:pandas.Series = None,repositories:"list[str]"=None,itemStatus:str = None,stockAreaCode:str=None,minimumStock:str=None,downloadTimeout=30000):
 
     page = context.new_page()
     page.goto("http://wms.sinotruk.com/") 

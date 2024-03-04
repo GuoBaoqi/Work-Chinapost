@@ -76,7 +76,6 @@ def PreprocessData():
 def Process():
     while 1:
         try:
-            WMSControl.UpdateInfo()
             WMSControl.DownLoadDiffTable()
             outbondDiffTable = GenInStockDiffTable.GenOutbondDiffTable(r".\download\仓储配送计划缺件执行.xlsx")
             WMSControl.DownLoadStockTable(r".\download\差异物料库存查询.xlsx",itemCodes = outbondDiffTable["物料编码"],repositories=["制造部平面仓储5库","制造部平面仓储库","制造部智能立体库"],itemStatus = "合格",minimumStock = "1")
@@ -97,7 +96,6 @@ if __name__ == "__main__":
     with sync_playwright() as playwright:
         WMSControl.InitBrowser(playwright)
         while 1:
-            WMSControl.UpdateInfo()
             WMSControl.DownLoadDiffTable()
             outbondDiffTable = GenInStockDiffTable.GenOutbondDiffTable(r".\download\仓储配送计划缺件执行.xlsx")
             WMSControl.DownLoadStockTable(r".\download\差异物料库存查询.xlsx",itemCodes = outbondDiffTable["物料编码"],repositories=["制造部平面仓储5库","制造部平面仓储库","制造部智能立体库"],itemStatus = "合格",minimumStock = "1")

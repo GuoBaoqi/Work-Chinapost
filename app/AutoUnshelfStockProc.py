@@ -8,7 +8,6 @@ from . import Base
 def Process():
     while 1:
         try:
-            WMSControl.UpdateInfo()
             WMSControl.DownLoadDiffTable()
             WMSControl.DownLoadStockTable(r".\download\S库物料库存查询.xlsx",repositories=["制造部平面仓储5库","制造部平面仓储库","制造部智能立体库"],stockAreaCode="S")
             GenUnshelfStockTable.Process(r".\download\S库物料库存查询.xlsx",r".\download\仓储配送计划缺件执行.xlsx")

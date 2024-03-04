@@ -1,19 +1,59 @@
 import pandas
 
+def GetSubassemblyStationTable():
+    subassemblyStationTable = pandas.read_excel(r".\data\Config.xlsx",sheet_name = "分装工位表")
+    return subassemblyStationTable
+
 def GetDiffStartDate():
     planStateTable = pandas.read_excel(r".\data\Config.xlsx",sheet_name = "排产状况表")
-    matchFlags = planStateTable.apply(lambda row : not (row["总装一线"].isnull() | row["总装二线"].isnull()),axis='columns')
+    matchFlags = planStateTable.apply(lambda row : not (row["一线完成情况"].isnull() | row["二线完成情况"].isnull()),axis='columns')
     planStateTable.drop(planStateTable[matchFlags].index,inplace = True)
     return planStateTable["生产日期"].min()
 
 def GetDiffEndDate():
     planStateTable = pandas.read_excel(r".\data\Config.xlsx",sheet_name = "排产状况表")
-    matchFlags = planStateTable.apply(lambda row : not (row["总装一线"].isnull() | row["总装二线"].isnull()),axis='columns')
+    matchFlags = planStateTable.apply(lambda row : not (row["一线完成情况"].isnull() | row["二线完成情况"].isnull()),axis='columns')
     planStateTable.drop(planStateTable[matchFlags].index,inplace = True)
     return planStateTable["生产日期"].max()
 
 def GetDiffOutboundDateTable():
     planStateTable = pandas.read_excel(r".\data\Config.xlsx",sheet_name = "排产状况表")
-    matchFlags = planStateTable.apply(lambda row : not (row["总装一线"].isnull() | row["总装二线"].isnull()),axis='columns')
+    matchFlags = planStateTable.apply(lambda row : not (row["一线完成情况"].isnull() | row["二线完成情况"].isnull()),axis='columns')
     planStateTable.drop(planStateTable[matchFlags].index,inplace = True)
-    return planStateTable
+
+    DiffOutboundDateTable = pandas.DataFrame()
+    indexCount = 0
+    for index,row in planStateTable.iterrows():
+        if not row["一线完成情况"].empty:
+            if row["一线跨"].empty:
+                tempDf = pandas.DataFrame({"生产日期":row["生产日期"],"生产线":"L1","跨分拣":"否" },index=[indexCount])
+                DiffOutboundDateTable = pandas.concat([DiffOutboundDateTable, tempDf])
+                indexCount += 1
+            elif row["一线跨"]== "全部":
+                tempDf = pandas.DataFrame({"生产日期":row["生产日期"],"生产线":"L1","跨分拣":"是" },index=[indexCount])
+                DiffOutboundDateTable = pandas.concat([DiffOutboundDateTable, tempDf])
+                indexCount += 1
+            elif row["一线跨"]== "分装":
+                tempDf = pandas.DataFrame({"生产日期":row["生产日期"],"生产线":"L1","跨分拣":"分装" },index=[indexCount])
+                DiffOutboundDateTable = pandas.concat([DiffOutboundDateTable, tempDf])
+                indexCount += 1
+                tempDf = pandas.DataFrame({"生产日期":row["生产日期"],"生产线":"L1","跨分拣":"否" },index=[indexCount])
+                DiffOutboundDateTable = pandas.concat([DiffOutboundDateTable, tempDf])
+                indexCount += 1
+        if not row["二线完成情况"].empty:
+            if row["二线跨"].empty:
+                tempDf = pandas.DataFrame({"生产日期":row["生产日期"],"生产线":"L2","跨分拣":"否" },index=[indexCount])
+                DiffOutboundDateTable = pandas.concat([DiffOutboundDateTable, tempDf])
+                indexCount += 1
+            elif row["二线跨"]== "全部":
+                tempDf = pandas.DataFrame({"生产日期":row["生产日期"],"生产线":"L2","跨分拣":"是" },index=[indexCount])
+                DiffOutboundDateTable = pandas.concat([DiffOutboundDateTable, tempDf])
+                indexCount += 1
+            elif row["二线跨"]== "分装":
+                tempDf = pandas.DataFrame({"生产日期":row["生产日期"],"生产线":"L2","跨分拣":"分装" },index=[indexCount])
+                DiffOutboundDateTable = pandas.concat([DiffOutboundDateTable, tempDf])
+                indexCount += 1
+                tempDf = pandas.DataFrame({"生产日期":row["生产日期"],"生产线":"L2","跨分拣":"否" },index=[indexCount])
+                DiffOutboundDateTable = pandas.concat([DiffOutboundDateTable, tempDf])
+                indexCount += 1
+    return DiffOutboundDateTable
