@@ -24,8 +24,8 @@ def GetDiffOutboundDateTable():
     DiffOutboundDateTable = pandas.DataFrame()
     indexCount = 0
     for index,row in planStateTable.iterrows():
-        if not row["一线完成情况"].empty:
-            if row["一线跨"].empty:
+        if not row.isnull().loc["一线完成情况"]:
+            if row.isnull().loc["一线跨"]:
                 tempDf = pandas.DataFrame({"生产日期":row["生产日期"],"生产线":"L1","跨分拣":"否" },index=[indexCount])
                 DiffOutboundDateTable = pandas.concat([DiffOutboundDateTable, tempDf])
                 indexCount += 1
@@ -40,8 +40,8 @@ def GetDiffOutboundDateTable():
                 tempDf = pandas.DataFrame({"生产日期":row["生产日期"],"生产线":"L1","跨分拣":"否" },index=[indexCount])
                 DiffOutboundDateTable = pandas.concat([DiffOutboundDateTable, tempDf])
                 indexCount += 1
-        if not row["二线完成情况"].empty:
-            if row["二线跨"].empty:
+        if not row.isnull().loc["二线完成情况"]:
+            if row.isnull().loc["二线跨"]:
                 tempDf = pandas.DataFrame({"生产日期":row["生产日期"],"生产线":"L2","跨分拣":"否" },index=[indexCount])
                 DiffOutboundDateTable = pandas.concat([DiffOutboundDateTable, tempDf])
                 indexCount += 1
