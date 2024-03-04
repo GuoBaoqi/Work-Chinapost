@@ -82,7 +82,9 @@ def OutboundDiffItem(diffTable:pandas.DataFrame):
     for index,dateTableRow in GetConfig.GetDiffOutboundDateTable().iterrows():
         while True:
 
-            itemCodes = diffTable[diffTable.apply(lambda row : (row["生产日期"] ==dateTableRow["生产日期"]) and (row["生产线"] == dateTableRow["生产线"]) and ((not subassemblyStationTable[subassemblyStationTable["工位"] == row["工位"]].empty) if dateTableRow["跨分拣"]=="分装" else True),axis='columns')]["物料编码"].drop_duplicates()
+            itemCodes = diffTable[diffTable.apply(lambda row : (row["生产日期"] == dateTableRow["生产日期"].strftime('%Y-%m-%d')) and (row["生产线"] == dateTableRow["生产线"]) and ((not subassemblyStationTable[subassemblyStationTable["工位"] == row["工位"]].empty) if dateTableRow["跨分拣"]=="分装" else True),axis='columns')]["物料编码"].drop_duplicates()
+            if itemCodes.empty:
+                break
 
             #点击下箭头
             pageDiff.get_by_label("chevrondown").click()
@@ -123,7 +125,8 @@ def OutboundDiffItem(diffTable:pandas.DataFrame):
                 diffTable.drop(diffTable[matchFlags].index,inplace = True)
                 continue
             break
-
+        if itemCodes.empty:
+            continue
         #出库
         if dateTableRow["跨分拣"] != "否":
             pageDiff.get_by_label("跨分拣执行").click()
