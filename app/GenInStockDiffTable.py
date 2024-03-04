@@ -40,12 +40,8 @@ def DeleteNonOutbondSupplyerRow(diffTable:pandas.DataFrame):
     diffTable.drop(diffTable[matchFlags].index,inplace = True)
 
 def DeleteProductionCompletedDateRow(diffTable:pandas.DataFrame):
-    #删除一线已完成日期
-    matchFlags=diffTable.apply(lambda row :  (not diffOutboundDateTable.isnull().loc[diffOutboundDateTable['生产日期']==row['生产日期']].iloc[0]['一线完成情况'])&(row['生产线']=='L1'),axis='columns')
-    diffTable.drop(diffTable[matchFlags].index,inplace = True)
-
-    #删除二线已完成日期
-    matchFlags=diffTable.apply(lambda row :  (not diffOutboundDateTable.isnull().loc[diffOutboundDateTable['生产日期']==row['生产日期']].iloc[0]['二线完成情况'])&(row['生产线']=='L2'),axis='columns')
+    #删除不出库日期
+    matchFlags=diffTable.apply(lambda row :  (diffOutboundDateTable[diffOutboundDateTable['生产日期']==row['生产日期'] & diffOutboundDateTable['生产线']==row['生产线']].empty),axis='columns')
     diffTable.drop(diffTable[matchFlags].index,inplace = True)
 
 def DeleteNonOutbondRow(diffTable:pandas.DataFrame):
