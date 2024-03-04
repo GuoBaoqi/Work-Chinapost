@@ -6,19 +6,19 @@ def GetSubassemblyStationTable():
 
 def GetDiffStartDate():
     planStateTable = pandas.read_excel(r".\data\Config.xlsx",sheet_name = "排产状况表")
-    matchFlags = planStateTable.apply(lambda row : not (row["一线完成情况"].isnull() | row["二线完成情况"].isnull()),axis='columns')
+    matchFlags = planStateTable.apply(lambda row : not (row.isnull().loc["一线完成情况"] | row.isnull().loc["二线完成情况"]),axis='columns')
     planStateTable.drop(planStateTable[matchFlags].index,inplace = True)
     return planStateTable["生产日期"].min()
 
 def GetDiffEndDate():
     planStateTable = pandas.read_excel(r".\data\Config.xlsx",sheet_name = "排产状况表")
-    matchFlags = planStateTable.apply(lambda row : not (row["一线完成情况"].isnull() | row["二线完成情况"].isnull()),axis='columns')
+    matchFlags = planStateTable.apply(lambda row : not (row.isnull().loc["一线完成情况"] | row.isnull().loc["二线完成情况"]),axis='columns')
     planStateTable.drop(planStateTable[matchFlags].index,inplace = True)
     return planStateTable["生产日期"].max()
 
 def GetDiffOutboundDateTable():
     planStateTable = pandas.read_excel(r".\data\Config.xlsx",sheet_name = "排产状况表")
-    matchFlags = planStateTable.apply(lambda row : not (row["一线完成情况"].isnull() | row["二线完成情况"].isnull()),axis='columns')
+    matchFlags = planStateTable.apply(lambda row : not (row.isnull().loc["一线完成情况"] | row.isnull().loc["二线完成情况"]),axis='columns')
     planStateTable.drop(planStateTable[matchFlags].index,inplace = True)
 
     DiffOutboundDateTable = pandas.DataFrame()
