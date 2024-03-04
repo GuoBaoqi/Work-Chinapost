@@ -89,11 +89,11 @@ def OutboundDiffItem(diffTable:pandas.DataFrame):
             pageDiff.wait_for_timeout(1000)
             #输入起始日期
             pageDiff.locator(".dx-texteditor-input").first.click()
-            pageDiff.locator(".dx-texteditor-input").first.fill(dateTableRow["生产日期"])
+            pageDiff.locator(".dx-texteditor-input").first.fill(dateTableRow["生产日期"].strftime('%Y-%m-%d'))
             pageDiff.locator(".dx-texteditor-input").first.press("Enter")
             #输入结束日期
             pageDiff.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").click()
-            pageDiff.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill(dateTableRow["生产日期"])
+            pageDiff.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill(dateTableRow["生产日期"].strftime('%Y-%m-%d'))
             pageDiff.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
             #选择生产线
             pageDiff.locator(".dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-buttons-container > .dx-widget").first.click()
