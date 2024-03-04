@@ -81,9 +81,10 @@ def OutboundDiffItem(diffTable:pandas.DataFrame):
 
     for index,dateTableRow in GetConfig.GetDiffOutboundDateTable().iterrows():
         while True:
-
-            itemCodes = diffTable[diffTable.apply(lambda row : (row["生产日期"].strftime('%Y-%m-%d') == dateTableRow["生产日期"].strftime('%Y-%m-%d')) and (row["生产线"] == dateTableRow["生产线"]) and ((not subassemblyStationTable[subassemblyStationTable["工位"] == row["工位"]].empty) if dateTableRow["跨分拣"]=="分装" else True),axis='columns')]["物料编码"].drop_duplicates()
-            if itemCodes.empty:
+            diffMatchFlags = diffTable.apply(lambda row : (row["生产日期"] == dateTableRow["生产日期"]) and (row["生产线"] == dateTableRow["生产线"]) and ((not subassemblyStationTable[subassemblyStationTable["工位"] == row["工位"]].empty) if dateTableRow["跨分拣"]=="分装" else True),axis='columns')
+            itemCodes = diffTable[diffMatchFlags]["物料编码"].drop_duplicates()
+            diffTable.drop(diffTable[diffMatchFlags].index,inplace = True)#删除掉要出库的行
+            if itemCodes.empty:#如果没有能出库的物料则跳过此行
                 break
 
             #点击下箭头
@@ -91,11 +92,11 @@ def OutboundDiffItem(diffTable:pandas.DataFrame):
             pageDiff.wait_for_timeout(1000)
             #输入起始日期
             pageDiff.locator(".dx-texteditor-input").first.click()
-            pageDiff.locator(".dx-texteditor-input").first.fill(dateTableRow["生产日期"].strftime('%Y-%m-%d'))
+            pageDiff.locator(".dx-texteditor-input").first.fill(dateTableRow["生产日期"])
             pageDiff.locator(".dx-texteditor-input").first.press("Enter")
             #输入结束日期
             pageDiff.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").click()
-            pageDiff.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill(dateTableRow["生产日期"].strftime('%Y-%m-%d'))
+            pageDiff.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").fill(dateTableRow["生产日期"])
             pageDiff.locator("div:nth-child(2) > .search-content > .search-content-textBox > .dx-datebox > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-input-container > .dx-texteditor-input").press("Enter")
             #选择生产线
             pageDiff.locator(".dx-show-invalid-badge > .dx-dropdowneditor-input-wrapper > .dx-texteditor-container > .dx-texteditor-buttons-container > .dx-widget").first.click()
@@ -125,7 +126,7 @@ def OutboundDiffItem(diffTable:pandas.DataFrame):
                 diffTable.drop(diffTable[matchFlags].index,inplace = True)
                 continue
             break
-        if itemCodes.empty:
+        if itemCodes.empty:#如果没有能出库的物料则跳过此行
             continue
         #出库
         if dateTableRow["跨分拣"] != "否":
