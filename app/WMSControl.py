@@ -65,9 +65,8 @@ def DownLoadDiffTable():
     page.close()
     return
 
-def OutboundDiffItem(diffTable:pandas.DataFrame):
+def OutboundDiffItem(diffTable:pandas.DataFrame,prevOutboundTime = pandas.Timestamp.now()):
     subassemblyStationTable = GetConfig.GetSubassemblyStationTable()
-    outboundTime = pandas.Timestamp.now()
     #缺件页面
     pageDiff = context.new_page()
     pageDiff.goto("http://wms.sinotruk.com/") 
@@ -118,9 +117,9 @@ def OutboundDiffItem(diffTable:pandas.DataFrame):
 
             #查询库存变动
             DownLoadStockTable("download\\差异物料库存查询.xlsx",itemCodes=itemCodes,repositories=["制造部平面仓储库","制造部智能立体库"],itemStatus="合格")
-            diffStockTable = pandas.read_excel("download\\差异物料库存查询.xlsx")
+            diffStockTable = pandas.read_excel("download\\差异物料库存查询.xlsx",converters={"库位调整时间":pandas.Timestamp})
             #如果库存有所变动
-            changedDiffStockTable = diffStockTable[diffStockTable["库位调整时间"] > outboundTime]
+            changedDiffStockTable = diffStockTable[diffStockTable["库位调整时间"] > prevOutboundTime]
             if not changedDiffStockTable.empty:
                 matchFlags = diffTable.apply(lambda row :not changedDiffStockTable[changedDiffStockTable['物料编码'] == row['物料编码']].empty,axis='columns')
                 diffTable.drop(diffTable[matchFlags].index,inplace = True)
@@ -136,7 +135,7 @@ def OutboundDiffItem(diffTable:pandas.DataFrame):
 
         #前序继续
         try:
-            pageDiff.get_by_role("button", name="继续").click(timeout=2000)
+            pageDiff.get_by_role("button", name="继续执行").click(timeout=2000)
         except:
             pass
 
@@ -144,7 +143,7 @@ def OutboundDiffItem(diffTable:pandas.DataFrame):
         pageDiff.get_by_role("button", name="确 定").click(timeout=60000)
 
         #记录时间
-        outboundTime = pandas.Timestamp.now()
+        prevOutboundTime = pandas.Timestamp.now()
     #收尾
     pageDiff.close()
 

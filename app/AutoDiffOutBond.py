@@ -9,12 +9,13 @@ from . import Base
 def Process():
     while 1:
         try:
+            outboundStartTime = pandas.Timestamp.now()
             WMSControl.DownLoadDiffTable()
             outbondDiffTable = GenInStockDiffTable.GenOutbondDiffTable(r".\download\仓储配送计划缺件执行.xlsx")
             WMSControl.DownLoadStockTable(r".\download\差异物料库存查询.xlsx",itemCodes = outbondDiffTable["物料编码"],repositories=["制造部平面仓储5库","制造部平面仓储库","制造部智能立体库"],itemStatus = "合格",minimumStock = "1")
             GenInStockDiffTable.GenInStockDiffTable(outbondDiffTable,r".\download\差异物料库存查询.xlsx")
             diffTable = pandas.read_excel(r".\target\在库差异表.xlsx")
-            WMSControl.OutboundDiffItem(diffTable)
+            WMSControl.OutboundDiffItem(diffTable,outboundStartTime)
             break
         except:
             chose = input("出差异失败，输入y重试：")
