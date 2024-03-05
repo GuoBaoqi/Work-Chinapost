@@ -35,8 +35,7 @@ def UpdateStockLocationTable():
     newStockLocationTable.insert(0,"物料名称",tmp)
     tmp = stockTable.pop("物料子图号")
     newStockLocationTable.insert(0,"物料子图号",tmp)
-    matchFlags = newStockLocationTable.apply(lambda row : row["库位编码"].empty,axis='columns')
-    newStockLocationTable.drop(newStockLocationTable[matchFlags].index,inplace = True)
+    newStockLocationTable.drop(newStockLocationTable[newStockLocationTable["库位编码"].isnull()].index,inplace = True)
 
     #新库位表去重
     newStockLocationTable.drop_duplicates(subset=["物料子图号","库位编码"],inplace=True)
@@ -49,7 +48,7 @@ def UpdateStockLocationTable():
     matchFlags = newStockLocationTable.apply(lambda row : (row["库位编码"][:13] if type(row["库位编码"]) == str else "") == "312302.C13.88",axis='columns')
     newStockLocationTable.drop(newStockLocationTable[matchFlags].index,inplace = True)
     
-    matchFlags = newStockLocationTable.apply(lambda row : (row["库位编码"][7:8] if type(row["库位编码'"]) == str else '') == "S",axis='columns')
+    matchFlags = newStockLocationTable.apply(lambda row : (row["库位编码"][7:8] if type(row["库位编码"]) == str else '') == "S",axis='columns')
     newStockLocationTable.drop(newStockLocationTable[matchFlags].index,inplace = True)
 
     #删除旧库位表中新库位表有数据的物料

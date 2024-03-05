@@ -117,9 +117,9 @@ def OutboundDiffItem(diffTable:pandas.DataFrame,prevOutboundTime = pandas.Timest
 
             #查询库存变动
             DownLoadStockTable("download\\差异物料库存查询.xlsx",itemCodes=itemCodes,repositories=["制造部平面仓储库","制造部智能立体库"],itemStatus="合格")
-            diffStockTable = pandas.read_excel("download\\差异物料库存查询.xlsx",converters={"库位调整时间":pandas.Timestamp})
+            diffStockTable = pandas.read_excel("download\\差异物料库存查询.xlsx",converters={"创建时间":pandas.Timestamp,"库位调整时间":pandas.Timestamp})
             #如果库存有所变动
-            changedDiffStockTable = diffStockTable[diffStockTable["库位调整时间"] > prevOutboundTime]
+            changedDiffStockTable = diffStockTable[(diffStockTable["创建时间"] > prevOutboundTime) | (diffStockTable["库位调整时间"] > prevOutboundTime)]
             if not changedDiffStockTable.empty:
                 matchFlags = diffTable.apply(lambda row :not changedDiffStockTable[changedDiffStockTable['物料编码'] == row['物料编码']].empty,axis='columns')
                 diffTable.drop(diffTable[matchFlags].index,inplace = True)
