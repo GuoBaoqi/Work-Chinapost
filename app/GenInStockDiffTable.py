@@ -2,26 +2,27 @@ import pandas
 import re
 
 from . import Base
+from . import GetConfig
 
 不出库供应商表 = pandas.read_excel('data\\Config.xlsx',sheet_name='不出库供应商表',converters={'供应商编码':str})
 不出库库区表 = pandas.read_excel('data\\Config.xlsx',sheet_name='不出库库区表')
 临时不出库物料表 = pandas.read_excel('data\\Config.xlsx',sheet_name='临时不出库物料表')
-排产完成状况表 = pandas.read_excel('data\\Config.xlsx',sheet_name='排产完成状况表')
 缺件不出库表 = pandas.read_excel('data\\Data.xlsx',sheet_name='缺件不出库表',index_col=0)
 撤单件出库表 = pandas.read_excel('data\\Data.xlsx',sheet_name='撤单件出库表',index_col=0)
+diffOutboundDateTable = GetConfig.GetDiffOutboundDateTable()
 
 def UpdateInfo():
     global 不出库供应商表
     global 不出库库区表
     global 临时不出库物料表
-    global 排产完成状况表
+    global diffOutboundDateTable
     global 缺件不出库表
     global 撤单件出库表
 
     不出库供应商表 = pandas.read_excel('data\\Config.xlsx',sheet_name='不出库供应商表',converters={'供应商编码':str})
     不出库库区表 = pandas.read_excel('data\\Config.xlsx',sheet_name='不出库库区表')
     临时不出库物料表 = pandas.read_excel('data\\Config.xlsx',sheet_name='临时不出库物料表')
-    排产完成状况表 = pandas.read_excel('data\\Config.xlsx',sheet_name='排产完成状况表')
+    diffOutboundDateTable = GetConfig.GetDiffOutboundDateTable()
     缺件不出库表 = pandas.read_excel('data\\Data.xlsx',sheet_name='缺件不出库表',index_col=0)
     撤单件出库表 = pandas.read_excel('data\\Data.xlsx',sheet_name='撤单件出库表',index_col=0)
 
@@ -39,12 +40,8 @@ def DeleteNonOutbondSupplyerRow(diffTable:pandas.DataFrame):
     diffTable.drop(diffTable[matchFlags].index,inplace = True)
 
 def DeleteProductionCompletedDateRow(diffTable:pandas.DataFrame):
-    #删除一线已完成日期
-    matchFlags=diffTable.apply(lambda row :  (not 排产完成状况表.isnull().loc[排产完成状况表['生产日期']==row['生产日期']].iloc[0]['总装一线'])&(row['生产线']=='L1'),axis='columns')
-    diffTable.drop(diffTable[matchFlags].index,inplace = True)
-
-    #删除二线已完成日期
-    matchFlags=diffTable.apply(lambda row :  (not 排产完成状况表.isnull().loc[排产完成状况表['生产日期']==row['生产日期']].iloc[0]['总装二线'])&(row['生产线']=='L2'),axis='columns')
+    #删除不出库日期
+    matchFlags=diffTable.apply(lambda row : (diffOutboundDateTable[(diffOutboundDateTable['生产日期'] == row['生产日期']) & (diffOutboundDateTable['生产线'] == row['生产线'])].empty),axis='columns')
     diffTable.drop(diffTable[matchFlags].index,inplace = True)
 
 def DeleteNonOutbondRow(diffTable:pandas.DataFrame):
